@@ -17,13 +17,14 @@ const fastify = Fastify({ logger: true })
 
 // --- CORS ---
 fastify.register(fastifyCors, {
-  origin: [
-    'http://localhost:3000',
-    'https://ais-mag-ver2.vercel.app'
-  ],
-  credentials: true,
+    origin: [
+        'http://localhost:3000',
+        'https://ais-mag-ver2.vercel.app',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
 });
-
 // --- JWT ---
 fastify.register(fastifyJwt, {
     secret: process.env.JWT_SECRET || 'supersecret',
@@ -52,9 +53,9 @@ const port = process.env.PORT || process.env.APP_PORT || 5000
 const host = "0.0.0.0"
 
 fastify.listen({ port: Number(port), host }, (err, address) => {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
-  }
-  console.log(`✅ Server running at ${address}`)
+    if (err) {
+        fastify.log.error(err)
+        process.exit(1)
+    }
+    console.log(`✅ Server running at ${address}`)
 })
