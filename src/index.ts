@@ -45,6 +45,7 @@ fastify.register(towRoutes, { prefix: '/api' })
 
 // --- Start server ---
 const port = process.env.PORT || 5000
+
 fastify.listen({ port: Number(port) }, (err, address) => {
     if (err) {
         fastify.log.error(err)
