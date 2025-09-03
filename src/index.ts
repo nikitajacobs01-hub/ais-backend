@@ -44,12 +44,14 @@ fastify.register(insuranceRoutes, { prefix: '/api' })
 fastify.register(towRoutes, { prefix: '/api' })
 
 // --- Start server ---
-const port = process.env.PORT || 5000
 
-fastify.listen({ port: Number(port) }, (err, address) => {
-    if (err) {
-        fastify.log.error(err)
-        process.exit(1)
-    }
-    console.log(`Server running at ${address}`)
+const port = process.env.PORT || process.env.APP_PORT || 5000
+const host = "0.0.0.0"
+
+fastify.listen({ port: Number(port), host }, (err, address) => {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+  console.log(`✅ Server running at ${address}`)
 })
