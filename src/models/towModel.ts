@@ -1,19 +1,22 @@
-import { Schema, model, Document, Types } from 'mongoose'
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ITow extends Document {
-  towedBy?: string
-  towContact?: string
-  towEmail?: string
-  towingFee?: string
-  clientId: Types.ObjectId
+  clientId: mongoose.Types.ObjectId;
+  towedBy?: string;
+  towContact?: string;
+  towEmail?: string;
+  towingFee?: string;
 }
 
-const towSchema = new Schema<ITow>({
-  towedBy: String,
-  towContact: String,
-  towEmail: String,
-  towingFee: String,
-  clientId: { type: Schema.Types.ObjectId, ref: 'Client', unique: true, required: true }
-})
+const towSchema = new Schema<ITow>(
+  {
+    clientId: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
+    towedBy: String,
+    towContact: String,
+    towEmail: String,
+    towingFee: String,
+  },
+  { timestamps: true }
+);
 
-export default model<ITow>('Tow', towSchema)
+export default mongoose.model<ITow>('Tow', towSchema);

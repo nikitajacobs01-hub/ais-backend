@@ -1,29 +1,32 @@
-import { Schema, model, Document, Types } from 'mongoose'
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IVehicle extends Document {
-  registration: string
-  vin: string
-  engineNo: string
-  make: string
-  modelName: string // renamed from 'model'
-  odometer: string
-  colour: string
-  bookingDate: Date
-  quoteDate: Date
-  clientId: Types.ObjectId
+  clientId: mongoose.Types.ObjectId;
+  registration: string;
+  vin: string;
+  engineNo: string;
+  make: string;
+  modelName: string;
+  odometer: string;
+  colour: string;
+  bookingDate?: string;
+  quoteDate?: string;
 }
 
-const vehicleSchema = new Schema<IVehicle>({
-  registration: { type: String, required: true },
-  vin: { type: String, required: true },
-  engineNo: { type: String, required: true },
-  make: { type: String, required: true },
-  modelName: { type: String, required: true }, // renamed here too
-  odometer: { type: String, required: true },
-  colour: { type: String, required: true },
-  bookingDate: { type: Date, required: true },
-  quoteDate: { type: Date, required: true },
-  clientId: { type: Schema.Types.ObjectId, ref: 'Client', required: true }
-})
+const vehicleSchema = new Schema<IVehicle>(
+  {
+    clientId: { type: Schema.Types.ObjectId, ref: 'Client', required: true },
+    registration: String,
+    vin: String,
+    engineNo: String,
+    make: String,
+    modelName: String,
+    odometer: String,
+    colour: String,
+    bookingDate: String,
+    quoteDate: String,
+  },
+  { timestamps: true }
+);
 
-export default model<IVehicle>('Vehicle', vehicleSchema)
+export default mongoose.model<IVehicle>('Vehicle', vehicleSchema);

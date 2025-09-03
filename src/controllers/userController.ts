@@ -8,7 +8,6 @@ export const createUser = async (req: FastifyRequest, reply: FastifyReply) => {
       email: string
       password: string
     }
-    console.log('Request body:', req.body)
     const newUser = new User({ name, email, password })
     await newUser.save()
 
