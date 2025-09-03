@@ -17,7 +17,10 @@ const fastify = Fastify({ logger: true })
 
 // --- CORS ---
 fastify.register(fastifyCors, {
-  origin: 'http://localhost:3000', //frontend URL
+  origin: [
+    'http://localhost:3000',
+    'https://ais-mag-ver2.vercel.app'
+  ],
   credentials: true,
 });
 
