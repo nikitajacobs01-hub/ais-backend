@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import fastifyJwt from '@fastify/jwt'
 import fastifyCors from '@fastify/cors'
+import fastifyMultipart from '@fastify/multipart'
 
 // Routes
 import authRoutes from './routes/authRoutes'
@@ -12,55 +13,61 @@ import clientRoutes from './routes/clientRoutes'
 import vehicleRoutes from './routes/vehicleRoutes'
 import insuranceRoutes from './routes/insuranceRoutes'
 import towRoutes from './routes/towRoutes'
+import accidentLinkRoutes from './routes/accidentLinkRoutes'
+import accidentRoutes from './routes/accidentRoutes'
+import towDetailsRoutes from './routes/towDetailsroutes'
 
 dotenv.config()
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({
+  logger: true,
+  bodyLimit: 50 * 1024 * 1024, // 50 MB
+})
 
 /**
- * ------ CORS (MUST come before JWT and routes) ------
- * We allow localhost and your Vercel production domain.
- * Using a function so the plugin echoes the exact Origin in ACAO.
+ * ------ CORS (must be before JWT and routes) ------
  */
-const allowedOrigins = new Set<string>([
+const allowedOrigins = new Set([
   'http://localhost:3000',
-  'https://iasmag.vercel.app', // exact prod domain (no trailing slash)
+  'https://iasmag.vercel.app',
 ])
-
-// Optional: allow Vercel preview deploys for this project
 const previewRegex = /^https:\/\/.*-iasmag\.vercel\.app$/
 
 fastify.register(fastifyCors, {
   origin: (origin, cb) => {
-    // No Origin header (SSR/cURL/server-to-server) → allow
     if (!origin) return cb(null, true)
-
-    if (allowedOrigins.has(origin) || previewRegex.test(origin)) {
-      return cb(null, true) // fastify-cors will set Access-Control-Allow-Origin to the request Origin
-    }
-    // Not allowed
+    if (allowedOrigins.has(origin) || previewRegex.test(origin)) return cb(null, true)
     return cb(new Error('Not allowed by CORS'), false)
   },
-  credentials: false, // your frontend uses withCredentials: false (no browser cookies)
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 })
 
 /**
- * ------ JWT (register after CORS) ------
+ * ------ JWT ------
  */
 fastify.register(fastifyJwt, {
   secret: process.env.JWT_SECRET || 'supersecret',
 })
 
 /**
- * ------ Health check route ------
- * Avoid 404s on platform pings to "/"
+ * ------ Health check ------
  */
 fastify.route({
   method: ['GET', 'HEAD'],
   url: '/',
   handler: async (_req, reply) => reply.code(200).send({ ok: true }),
+})
+
+/**
+ * ------ Multipart (only once!) ------
+ */
+fastify.register(fastifyMultipart, {
+  limits: {
+    fileSize: 20 * 1024 * 1024, // 20 MB per file
+    files: 5,
+  },
 })
 
 /**
@@ -74,7 +81,6 @@ mongoose
 
 /**
  * ------ Routes ------
- * Auth first, then the rest
  */
 fastify.register(authRoutes, { prefix: '/api/auth' })
 fastify.register(userRoutes, { prefix: '/api' })
@@ -82,10 +88,12 @@ fastify.register(vehicleRoutes, { prefix: '/api' })
 fastify.register(clientRoutes, { prefix: '/api' })
 fastify.register(insuranceRoutes, { prefix: '/api' })
 fastify.register(towRoutes, { prefix: '/api' })
+fastify.register(accidentLinkRoutes)
+fastify.register(accidentRoutes, { prefix: '/api' })
+fastify.register(towDetailsRoutes, { prefix: '/api' })
 
 /**
  * ------ Start server ------
- * Bind to 0.0.0.0 and use the platform-provided PORT (Render)
  */
 const port = Number(process.env.PORT || process.env.APP_PORT || 5000)
 const host = '0.0.0.0'
