@@ -12,7 +12,7 @@ export const createAccidentLink = async (
 
     const link = await AccidentLink.create({ token, clientName: name, clientEmail: email, clientPhone: phone, expiresAt });
 
-    const formUrl = `http://localhost:3000/accident-form?token=${link.token}`;
+    const formUrl = `https://iasmag.vercel.app/accident-form?token=${link.token}`;
     const waLink = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${name}, please fill your accident info here: ${formUrl}`)}`;
 
     res.send({ waLink, token });
