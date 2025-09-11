@@ -113,7 +113,6 @@ export const getAccidentById = async (
 };
 
 // Assign tow company and update status
-// Assign tow company and update status
 export const assignTowCompany = async (
   req: FastifyRequest<{ Params: { id: string }; Body: { towCompany: string; towWhatsapp?: string } }>,
   reply: FastifyReply
@@ -133,17 +132,21 @@ export const assignTowCompany = async (
     accident.status = "assigned";
     await accident.save();
 
+    // Create Google Maps link from address
+    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accident.accidentLocation.address)}`;
+
     // Construct WhatsApp message
     const message = `
 Hello ${towCompany} 🚨
 
 A new accident has been reported:
 
-Client: ${accident.clientName}
-Phone: ${accident.clientPhone}
-Vehicle: ${accident.vehicleMake} ${accident.vehicleModel}
-Location: ${accident.accidentLocation.address}
-Description: ${accident.description || "N/A"}
+👤 Client: ${accident.clientName}  
+📞 Phone: ${accident.clientPhone}  
+🚗 Vehicle: ${accident.vehicleMake} ${accident.vehicleModel}  
+📍 Location: ${accident.accidentLocation.address}  
+🔗 Maps: ${mapsLink}  
+📝 Description: ${accident.description || "N/A"}
 
 Please respond to this message to confirm assistance.
 `;
@@ -164,3 +167,4 @@ Please respond to this message to confirm assistance.
     reply.status(500).send({ message: "Server error" });
   }
 };
+

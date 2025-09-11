@@ -10,10 +10,22 @@ export const createAccidentLink = async (
     const token = generateToken();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    const link = await AccidentLink.create({ token, clientName: name, clientEmail: email, clientPhone: phone, expiresAt });
+    const link = await AccidentLink.create({
+        token,
+        clientName: name,
+        clientEmail: email,
+        clientPhone: phone,
+        expiresAt,
+    });
 
     const formUrl = `https://iasmag.vercel.app/accident-form?token=${link.token}`;
-    const waLink = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${name}, please fill your accident info here: ${formUrl}`)}`;
+
+    // Add emergency number to the message
+    const message = `Hi ${name}, please fill in your accident info here: ${formUrl}
+
+🚑 *Emergency Medical Assistance (Netcare 911):* 082 911`;
+
+    const waLink = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
 
     res.send({ waLink, token });
 };
