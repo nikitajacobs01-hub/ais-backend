@@ -30,6 +30,7 @@ const fastify = Fastify({
 const allowedOrigins = new Set([
   'http://localhost:3000',
   'https://iasmag.vercel.app',
+  'http://51.20.80.89:3000',
 ])
 const previewRegex = /^https:\/\/.*-iasmag\.vercel\.app$/
 
